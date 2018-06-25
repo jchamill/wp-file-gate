@@ -1,5 +1,5 @@
 # File Gate Wordpress Plugin
-A Wordpress plugin the serves up a protected file upon submitting a form.
+A Wordpress plugin that provides a download link to a protected file upon submitting a form.
 
 ## Customize Form Fields
 name*|Your Name  
