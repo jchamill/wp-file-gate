@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: File Gate
- * Plugin URI: http://www.jacksonspalding.com
+ * Plugin URI: https://github.com/jchamill/wp-file-gate
  * Description: Require users to complete form with valid email to download a file.
  * Version: 0.0.1
- * Author: Jackson Spalding
- * Author URI: http://www.jacksonspalding.com
+ * Author: JC Hamill
+ * Author URI: https://jchamill.com/
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
