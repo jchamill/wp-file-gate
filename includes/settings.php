@@ -81,14 +81,6 @@ class File_Gate_Settings {
       'file-gate-settings', // Page
       'file_gate_form_section' // Section
     );
-
-    add_settings_field(
-      'success_message', // ID
-      'Success Message', // Title
-      array( $this, 'success_message_callback' ), // Callback
-      'file-gate-settings', // Page
-      'file_gate_form_section' // Section
-    );
   }
 
   /**
@@ -106,10 +98,6 @@ class File_Gate_Settings {
 
     if( isset( $input['form_fields'] ) ) {
       $new_input['form_fields'] = sanitize_textarea_field( $input['form_fields'] );
-    }
-
-    if( isset( $input['success_message'] ) ) {
-      $new_input['success_message'] = sanitize_text_field( $input['success_message'] );
     }
 
     return $new_input;
@@ -139,16 +127,6 @@ class File_Gate_Settings {
     printf(
       '<textarea id="form_fields" name="file_gate_form[form_fields]" class="widefat">%s</textarea>',
       isset( $this->options['form_fields'] ) ? esc_attr( $this->options['form_fields'] ) : ''
-    );
-  }
-
-  /**
-   * Get the settings option array and print one of its values
-   */
-  public function success_message_callback() {
-    printf(
-      '<input type="text" id="success_message" name="file_gate_form[success_message]" value="%s" class="widefat">',
-      isset( $this->options['success_message'] ) ? esc_attr( $this->options['success_message'] ) : ''
     );
   }
 }

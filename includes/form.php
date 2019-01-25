@@ -8,6 +8,7 @@ class File_Gate_Form {
 
   private $errors = array();
   private $submitted = false;
+  private $download_token = false;
 
   public function __construct( $File, $Download, $Submission ) {
     $this->hooks();
@@ -58,10 +59,10 @@ class File_Gate_Form {
     }
 
     if ( $this->submitted && empty( $this->errors ) ) {
-      $form_options = get_option( 'file_gate_form', false );
-      $success_message = ( $form_options && !empty( $form_options['success_message'] ) ) ? $form_options['success_message'] : 'You should receive an email with a link to your download.';
-
-      $html .= '<p><strong>' . $success_message . '</strong></p>';
+      $download_url = $this->get_download_url( $this->download_token );
+      $success_message = $file->success_message;
+      $success_message = str_replace( '%download_url%', $download_url, $success_message );
+      $html .= $success_message;
     } else {
 
       $html .= '<form action="' . $this->get_form_action() . '" method="post">';
@@ -158,22 +159,28 @@ class File_Gate_Form {
 
       // Get download (has a join on the files table).
       $download = $this->Download->find_by_id( $download_id );
+      $this->download_token = $download->token;
 
-      // Create file download url.
-      $protocol = ( $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
-      $download_url = $protocol . $_SERVER['HTTP_HOST'] . '/wp-json/file-gate/v1/download/' . $download->token;
+      if ( ! empty( $download->email_message ) ) {
+        $download_url = $this->get_download_url( $download->token );
 
-      // Email subject.
-      $email_subject = ! empty( $download->email_subject ) ? $download->email_subject : 'Your Download';
+        // Email subject.
+        $email_subject = ! empty( $download->email_subject ) ? $download->email_subject : 'Your Download';
 
-      // Build email message.
-      $email_message = ! empty( $download->email_message ) ? $download->email_message : '<p>Hi,<br><br>You are receiving this email because you requested to download a file from our website.<br><br>We hope you find this information to be valuable.<br><br></p><p><a href="%download_url%">Download Now</a></p>';
-      $email_message = str_replace( '%download_url%', $download_url, $email_message );
-      $email_message = str_replace( '%file_title%', $download->title, $email_message );
+        // Build email message.
+        $email_message = $download->email_message;
+        $email_message = str_replace( '%download_url%', $download_url, $email_message );
 
-      // Send email.
-      wp_mail( $email, $email_subject, $email_message );
+        // Send email.
+        wp_mail( $email, $email_subject, $email_message );
+      }
+
     }
+  }
+
+  public function get_download_url($token) {
+    $protocol = ( $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
+    return $protocol . $_SERVER['HTTP_HOST'] . '/wp-json/file-gate/v1/download/' . $token;
   }
 
   public function form_validate( $fields, $data ) {

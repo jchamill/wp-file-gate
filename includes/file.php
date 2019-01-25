@@ -11,7 +11,7 @@ class File_Gate_File {
     $this->table = $wpdb->prefix . 'file_gate_files';
   }
 
-  public function create( $title, $email_subject, $email_message, $filename ) {
+  public function create( $title, $email_subject, $email_message, $success_message, $filename ) {
     $this->db->insert(
       $this->table,
       array(
@@ -19,6 +19,7 @@ class File_Gate_File {
         'filename' => $filename,
         'email_subject' => $email_subject,
         'email_message' => $email_message,
+        'success_message' => $success_message,
         'timestamp' => time(),
       )
     );
@@ -26,11 +27,12 @@ class File_Gate_File {
     return $this->db->insert_id;
   }
 
-  public function update( $id, $title, $email_subject, $email_message, $filename = '' ) {
+  public function update( $id, $title, $email_subject, $email_message, $success_message, $filename = '' ) {
     $data = array(
       'title' => $title,
       'email_subject' => $email_subject,
       'email_message' => $email_message,
+      'success_message' => $success_message,
     );
     $placeholders = array(
       '%s',

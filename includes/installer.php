@@ -22,6 +22,7 @@ class File_Gate_Installer {
       filename varchar(100) NOT NULL,
       email_subject varchar(100),
       email_message text,
+      success_message text,
       downloads mediumint(9) UNSIGNED DEFAULT 0 NOT NULL,
       timestamp int(11) NOT NULL,
       PRIMARY KEY  (id)

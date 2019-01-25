@@ -188,6 +188,7 @@ class File_Gate {
           <th>Title</th>
           <th>Filename</th>
           <th>Downloads</th>
+          <th>Shortcode</th>
           <th></th>
         </tr>
         </thead>
@@ -198,6 +199,7 @@ class File_Gate {
             <td><?php print esc_html($file->title); ?></td>
             <td><?php print esc_html($file->filename); ?></td>
             <td><?php print esc_html($file->downloads); ?></td>
+            <td>[file-gate file_id="<?php print esc_html($file->id); ?>"]</td>
             <td>
               <a href="<?php print admin_url( 'admin.php?page=file-gate-create-file&file_id=' . $file->id ); ?>">Edit</a> |
               <a href="<?php print admin_url( 'admin.php?page=file-gate-delete-file&file_id=' . $file->id ); ?>">Delete</a>
@@ -291,13 +293,13 @@ class File_Gate {
         <table class="form-table">
           <tbody>
           <tr>
-            <th scope="row">Title</th>
+            <th scope="row">Title (Required)</th>
             <td>
               <input class="widefat" type="text" name="title" value="<?php print $file ? esc_attr( $file->title ) : ''; ?>">
             </td>
           </tr>
           <tr>
-            <th scope="row">File</th>
+            <th scope="row">File (Required)</th>
             <td>
               <input type="file" name="file"><br>
               <?php if ( $file ): ?>
@@ -315,7 +317,14 @@ class File_Gate {
             <th scope="row">Email Message</th>
             <td>
               <textarea class="widefat" name="email_message"><?php print $file ? $file->email_message : ''; ?></textarea><br>
-              <span class="description">Placeholders: %download_url% %file_title%</span>
+              <span class="description">Leave blank if you do not want to send an email.<br>Placeholders: %download_url%</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Success Message (Required)</th>
+            <td>
+              <textarea class="widefat" name="success_message"><?php print $file ? $file->success_message : ''; ?></textarea><br>
+              <span class="description">If you are not sending an email, be sure to add a link to the download.<br>Placeholders: %download_url%</span>
             </td>
           </tr>
           </tbody>
@@ -341,9 +350,10 @@ class File_Gate {
       if ( file_exists( $_FILES['file']['tmp_name'] ) || is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
         // @todo Create customizable file path.
         //$protocol = ( $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
+        $site_url = get_site_url();
         $upload_dir = wp_upload_dir();
         $full_path = $upload_dir['basedir'] . '/private/';
-        $path = str_replace(WP_HOME, '', $upload_dir['baseurl']) . '/private/';
+        $path = str_replace($site_url, '', $upload_dir['baseurl']) . '/private/';
 
         $file_name = $_FILES['file']['name'];
         $file_tmp_name = $_FILES['file']['tmp_name'];
@@ -381,14 +391,15 @@ class File_Gate {
         $title = $this->sanitize( $_POST['title'] );
         $email_subject = $this->sanitize( $_POST['email_subject'] );
         $email_message = wp_kses_post( $_POST['email_message'] );
+        $success_message = wp_kses_post( $_POST['success_message'] );
 
         if ( $file ) {
-          $this->File->update( $file->id, $title, $email_subject, $email_message, $file_path);
+          $this->File->update( $file->id, $title, $email_subject, $email_message, $success_message, $file_path);
           if ( $file_uploaded ) {
             unlink( ABSPATH . $file->filename );
           }
         } else {
-          $this->File->create( $title, $email_subject, $email_message, $file_path );
+          $this->File->create( $title, $email_subject, $email_message, $success_message, $file_path );
         }
       }
     }
