@@ -160,20 +160,6 @@ class File_Gate {
     remove_submenu_page( 'file-gate', 'file-gate-delete-file' );
   }
 
-  /**
-   * Get files from database table.
-   *
-   * @todo Finish implementation.
-   */
-  public function get_files() {
-    $file = new stdClass;
-    $file->id = 1;
-    $file->title = 'Content Marketing Whitepaper';
-    $file->filename = 'content-marketing-wp.pdf';
-
-    return array($file);
-  }
-
   public function view_files() {
     $files = $this->File->find_all();
     ?>
